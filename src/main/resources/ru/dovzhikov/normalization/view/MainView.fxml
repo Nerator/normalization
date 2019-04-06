@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Text?>
+
+<HBox style="-fx-background-color: #262626;" xmlns="http://javafx.com/javafx/8.0.72"
+>
+   <padding>
+      <Insets bottom="50.0" left="80.0" right="80.0" top="50.0"/>
+   </padding>
+   <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font: normal bold 100pt sans-serif;" text="Scala">
+      <fill>
+         <LinearGradient>
+            <stops>
+               <Stop color="RED"/>
+               <Stop color="DARKRED" offset="1.0"/>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font: italic bold 100pt sans-serif;" text="FX">
+      <effect>
+         <DropShadow color="DARKGRAY" spread="0.15"/>
+      </effect>
+      <fill>
+         <LinearGradient>
+            <stops>
+               <Stop color="WHITE"/>
+               <Stop color="DARKGRAY" offset="1.0"/>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+</HBox>

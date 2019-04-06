@@ -1,0 +1,36 @@
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/target/
+project/project/
+.history
+.cache
+.lib/
+
+# Eclipse
+.cache
+.classpath
+.project
+.scala_dependencies
+.settings
+.cache-main
+.cache-tests
+.target/
+bin/
+
+# IntellijIdea files
+*.iml
+.idea
+out
+
+/package
+
+*.bak*
+*.sql
+*.db
