@@ -2,7 +2,7 @@ package ru.dovzhikov.normalization.model
 
 object Normalization {
 
-  private def meanAndStdev(l: List[Double]): (Double, Double) = {
+  def meanAndStdev(l: List[Double]): (Double, Double) = {
     val len = l.length
     val mean = l.sum / len
     val std = math.sqrt(l.map(v => math.pow(v - mean, 2.0)).sum / (len - 1))
