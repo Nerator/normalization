@@ -1,10 +1,11 @@
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
-      organization   := "ru.dovzhikov",
-      scalaVersion   := "2.12.8",
-      version        := "0.1-SNAPSHOT",
-      scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+      organization       := "ru.dovzhikov",
+      scalaVersion       := "2.12.8",
+      crossScalaVersions := Seq("2.11.12", "2.12.8"),
+      version            := "0.1-SNAPSHOT",
+      scalacOptions      ++= Seq("-unchecked", "-deprecation", "-feature")
     )),
     name := "normalization",
     resolvers += Resolver.sonatypeRepo("releases"),
@@ -32,3 +33,10 @@ lazy val root = (project in file(".")).
     // Fork a new JVM for 'run' and 'test:run' to avoid JavaFX double initialization problems
     fork := true
   )
+
+Compile / scalacOptions ++= {
+  scalaBinaryVersion.value match {
+    case "2.11" => Seq("-Xexperimental")
+    case _      => Nil
+  }
+}
