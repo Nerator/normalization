@@ -148,13 +148,10 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     //implicit val abc = DConvert.t2r[(Int, Char), (Int, Char)]
     //val sl = b2dialog.showAndWait[((Int, Char)) => (Int, Char)]()
     val sl = b2dialog.showAndWait()
-    sl match {
-      case None =>
-      case Some((s, l)) =>
+    sl foreach { case Some((s, l)) =>
         qal.show()
         // TODO: need case class to store result...
         DBUtil.risk2ById(s.asInstanceOf[Int], l.asInstanceOf[Char]) andThen {
-        //DBUtil.risk2ById(s, l) andThen {
           case _ => qal.close()
         } onComplete {
           case Success(risk) =>
