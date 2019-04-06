@@ -27,8 +27,7 @@ lazy val root = (project in file(".")).
     
     // set the main class for the main 'run' task
     // change Compile to Test to set it for 'test:run'
-    //mainClass in (Compile, run) := Some("ru.dovzhikov.normalization.TestFXML"),
-    mainClass in (Compile, run) := Some("ru.dovzhikov.normalization.model.Test"),
+    mainClass in (Compile, run) := Some("ru.dovzhikov.normalization.TestFXML"),
     
     // Fork a new JVM for 'run' and 'test:run' to avoid JavaFX double initialization problems
     fork := true
