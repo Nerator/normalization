@@ -11,7 +11,7 @@ import org.scalatest.time.{Millis, Seconds, Span}
 class InputDataSpec extends FlatSpec with Matchers with Futures with ScalaFutures {
 
   implicit override val patienceConfig =
-    PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
+    PatienceConfig(timeout = Span(5, Seconds), interval = Span(5, Millis))
 
   "downloadRar" should "work correctly" in {
     val rar = InputData.downloadRar()
