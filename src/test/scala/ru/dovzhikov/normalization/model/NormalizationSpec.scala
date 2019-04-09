@@ -1,15 +1,10 @@
-package ru.dovzhikov.normalization.ui.model
-
-import java.sql.Date
+package ru.dovzhikov.normalization.model
 
 import org.scalatest._
-// import breeze.linalg.{DenseVector, zipValues}
-import ru.dovzhikov.normalization.model.Normalization
 
 class NormalizationSpec extends FlatSpec with Matchers {
 
   private val EPS = 1e-8
-  //val test = new Date()
 
   val values = List(
     0.4765201686,
@@ -63,7 +58,6 @@ class NormalizationSpec extends FlatSpec with Matchers {
     mean shouldEqual 0.4497841828 +- EPS
     stdev shouldEqual 0.0168163871 +- EPS // Sample LOCalc: STDEV
     //stdev shouldEqual 0.0166241935 +- EPS // Population LOCalc: STDEV.P
-
   }
 
   "minmax" should "work correctly" in {
