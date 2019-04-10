@@ -195,18 +195,15 @@ object DBUtil {
     val rowsAreContained = keysF map (seq => {
       println(s"total: ${rows.length} rows")
       println(s"in seq: ${seq.length} rows")
-      val toadd = rows filterNot (xlsrow => {
-        val abc = seq.contains((xlsrow.id.toInt, xlsrow.name, xlsrow.subjName))
-        //if (!abc)
-        //println(s"Found missing row: $xlsrow")
-        abc
-      })
+      val toadd = rows filterNot (xlsrow =>
+        seq.contains((xlsrow.id.toInt, xlsrow.name, xlsrow.subjName))
+        )
       println(s"going to add ${toadd.length}") //TODO: 22471 all the time
       toadd
     })
 
     //val abc = rowsAreContained map (list =>
-    val abc = for {
+    val actionsList = for {
       list <- rowsAreContained
       oyamap <- oyaIdByName
       subjmap <- subjIdByName
@@ -224,9 +221,7 @@ object DBUtil {
         ))
 
     println("got future")
-    val abc1 = abc map (abcc => DBIO.seq(abcc: _*))
-    abc1 flatMap (abcc => db.run(abcc))
-
+    actionsList flatMap (dbaction => db.run(DBIO.seq(dbaction: _*)))
   }
 
   lazy val letters: Seq[(Char, String)] = {

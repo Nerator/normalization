@@ -2,7 +2,6 @@ package ru.dovzhikov.normalization.model
 
 import org.scalatest._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import java.io.File
 
 import org.scalatest.concurrent.{Futures, ScalaFutures}
