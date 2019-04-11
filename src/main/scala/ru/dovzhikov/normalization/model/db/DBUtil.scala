@@ -53,7 +53,7 @@ object DBUtil {
       q1res <- db.run(q1)
     } yield q1res.map {
       case (id, p, s, t, k) => (id.toInt, p * t * k * (if (s > areaMap(id.toInt)) 1.0 else s / areaMap(id.toInt)))
-    }.groupBy(_._1) mapValues (_.unzip._2.sum)
+    }.groupBy(_._1) mapValues (_.map(_._2).sum)
 
     for {
       (_, vrpMap) <- areaVrp
@@ -89,13 +89,13 @@ object DBUtil {
     }: _*))
 
     val sum = for {
-      vrpmap <- vrp
+      //vrpmap <- vrp //TODO: Look into why not used
       areamap <- area
       q1vec <- db.run(q1)
     } yield q1vec map {
       case (id, ot, p, s, t) => ((id.toInt, ot.head), p * t * (if (s > areamap(id.toInt)) 1.0 else s / areamap(id.toInt)))
     } groupBy(_._1) map {
-      case (k, vec) => (k, vec.unzip._2.sum)
+      case (k, vec) => (k, vec.map(_._2).sum)
     }
 
     for {
@@ -107,7 +107,7 @@ object DBUtil {
   }
 
   def risk2ById(id: Int, some: Char): Future[Double] =
-    risk2 map (_(id, some))
+    risk2 map (_((id, some)))
 
   def risk3(norm: List[Double] => List[Double]): Future[Map[Int, Double]] = {
     // Get subjects' area

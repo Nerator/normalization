@@ -13,17 +13,16 @@ import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.control._
 import scalafx.scene.layout.{BorderPane, GridPane}
-import scalafx.stage.{FileChooser, Modality}
+import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafxml.core.macros.sfxml
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 @sfxml
 class TestController(private val bpane: BorderPane) extends TestControllerInterface {
 
-  def openDBHandle(ae: ActionEvent) {
+  def openDBHandle(ae: ActionEvent): Unit = {
     val fileChooser = new FileChooser {
       title = "Open Resource File"
       extensionFilters += new ExtensionFilter("Database Files", "*.db")
@@ -33,13 +32,13 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     if (selectedFile != null) println(selectedFile)
   }
 
-  def onClose(ae: ActionEvent) {
+  def onClose(ae: ActionEvent): Unit = {
     println(s"java version: ${System.getProperty("java.version")}")
     println(s"javafx version: ${System.getProperty("javafx.version")}")
     Platform.exit()
   }
 
-  def al(text: String) = {
+  def al(text: String): Alert = {
     val al = new Alert(AlertType.None) {
       contentText = text
       // it is not possible to programmatically close a dialog box that doesn't have a Close/Cancel button:
@@ -49,13 +48,13 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     al
   }
 
-  val qal = al("querying...")
+  val qal: Alert = al("querying...")
 
-  val tidSubj = new TextInputDialog {
+  val tidSubj: TextInputDialog = new TextInputDialog {
     headerText = "Enter subject ID"
   }
 
-  val tidLetter = new TextInputDialog {
+  val tidLetter: TextInputDialog = new TextInputDialog {
     headerText = "Enter letter"
   }
 
@@ -118,7 +117,7 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
   }
 
   def button1Handle(ae: ActionEvent): Unit = {
-    val selection = cd(DBUtil.subjects.unzip._2, "Choose subject")
+    val selection = cd(DBUtil.subjects.map(_._2), "Choose subject")
       .showAndWait()
       .map(sn => DBUtil.subjects.filter(t => t._2 == sn).head._1.toInt)
     selection foreach (s => {

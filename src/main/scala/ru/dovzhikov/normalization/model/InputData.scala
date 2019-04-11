@@ -28,7 +28,7 @@ object InputData {
   // Currently fixed with passing -Dfile.encoding=windows-1251 parameter to sbt
   // But may be will be useful later?
 
-  private def toUTF8(s: String) = scala.io.Source.fromBytes(s.getBytes, "UTF-8").mkString
+  // private def toUTF8(s: String) = scala.io.Source.fromBytes(s.getBytes, "UTF-8").mkString
 
   /**
     * Downloads RAR archive from meteo.ru to specified location, extracts XLS there and deletes RAR
