@@ -83,6 +83,7 @@ lazy val root = (project in file(".")).
 // Fix for sfxml error
 Compile / scalacOptions -= "-Ywarn-value-discard"
 
+// Fix for 2.11
 Compile / scalacOptions --= {
   scalaBinaryVersion.value match {
     case "2.11" => Seq(
@@ -98,6 +99,8 @@ Compile / scalacOptions --= {
     case _      => Nil
   }
 }
+
+// Fix for SAM syntax in 2.11
 Compile / scalacOptions ++= {
   scalaBinaryVersion.value match {
     case "2.11" => Seq("-Xexperimental")

@@ -20,10 +20,6 @@ object InputData {
   private val defaultLink = "http://meteo.ru/component/docman/doc_download/502-massiv-dannykh-russkij?Itemid="
   private val tmpDir = new File(System.getProperty("java.io.tmpdir"))
 
-  // TMP for typecheck
-  type RAR = File
-  type XLS = File
-
   // Fix for strings in windows shell in Idea
   // Currently fixed with passing -Dfile.encoding=windows-1251 parameter to sbt
   // But may be will be useful later?
@@ -53,7 +49,7 @@ object InputData {
   //    rar.delete()
   //    farr.head
   //  }
-  def downloadRar(destination: File = tmpDir, link: String = defaultLink): Future[RAR] = Future {
+  def downloadRar(destination: File = tmpDir, link: String = defaultLink): Future[File] = Future {
     if (!destination.exists()) destination.mkdirs()
     if (!destination.isDirectory) throw new IllegalArgumentException("destination should be directory")
 
@@ -67,7 +63,7 @@ object InputData {
     rar
   }
 
-  def extractXls(rar: File, destination: File = tmpDir): Future[XLS] = Future {
+  def extractXls(rar: File, destination: File = tmpDir): Future[File] = Future {
     Junrar.extract(rar, destination)
 
     val farr = destination.listFiles(file => file.getName == "ojdamage_rus.xls")
@@ -76,12 +72,29 @@ object InputData {
     farr.head
   }
 
-  // Get list of rows from file (excluding header)
+  // Функции для работы с XLS
+
+  /**
+    * Получает список строк (за исключением заголовка) из XLS файла
+    * @param xls файл XLS
+    * @return список строк
+    */
   def getRows(xls: File): List[Row] =
     new HSSFWorkbook(new FileInputStream(xls)).getSheetAt(0).rowIterator
       .asScala.toList.tail
 
-  // Case class for xls row
+  /**
+    * Класс, для представления строк электронной таблицы
+    * @param id номер наблюдения
+    * @param startDate дата начала
+    * @param endDate дата окончания
+    * @param amount количество опасных явлений
+    * @param earliness заблаговременность
+    * @param name название опасного явления
+    * @param intensivity интенсивность
+    * @param subjName название субъекта
+    * @param comment комментарий
+    */
   case class XLSRow(id: Double, startDate: Date, endDate: Date, amount: Int,
                     earliness: String, name: String, intensivity: Int,
                     subjName: String, comment: String)

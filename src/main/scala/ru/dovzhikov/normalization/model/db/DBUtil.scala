@@ -12,21 +12,35 @@ import scala.concurrent.duration.Duration
 
 import java.text.SimpleDateFormat
 
+/**
+  * Модуль, содержащий операции по работе с базой данных
+  */
 object DBUtil {
 
-  val db = Database.forConfig("climate")
+  private val db = Database.forConfig("climate")
 
+  /**
+    * Отображение (Map) названий субъектов РФ в числовые идентификаторы
+    * Тип идентификатора оставлен как String
+    */
   lazy val subjIdByName: Future[Map[String, String]] = {
     val q = СубъектыРф.map(s => (s.назсубъекта, s.идсубъекта))
     db.run(q.result) map (Map(_: _*))
   }
 
+  /**
+    * Отображение (Map) названий опасных явлений в числовые идентификаторы
+    */
   lazy val oyaIdByName: Future[Map[String, Int]] = {
     //val q = СубъектыРф.filter(r => (names contains r.назсубъекта).asColumnOf[Boolean]).map(_.идсубъекта)
     val q = СписокОпасныхЯвлений.map(o => (o.названиеОпасногоЯвления, o.номерЯвления))
     db.run(q.result) map (Map(_: _*))
   }
 
+  /**
+    * Отображение, необходимое для вычисления обобщённого индекса погодно-климатического
+    * риска для экономики субъектов РФ
+    */
   lazy val risk1: Future[Map[Int, Double]] = {
     val q1 =
       sql"""SELECT ИДСубъекта, [Повторяемость ОЯ в субъектеРФ], [Площадь ОЯ],
@@ -63,9 +77,20 @@ object DBUtil {
     } yield (k, sumMap.getOrElse(k, 0.0) * vrpMap.getOrElse(k, 0.0))).toSeq: _*)
   }
 
+  /**
+    * Функция вычисления обобщённого индекса погодно-климатического риска для
+    * экономики конкретного субъекта РФ
+    *
+    * @param id идентификатор субъекта РФ
+    * @return индекс погодно-климатического риска для экономики субъекта РФ
+    */
   def risk1ById(id: Int): Future[Double] =
     risk1 map (_(id))
 
+  /**
+    * Отображение, необходимое для вычисления доли риска для конкретного сектора
+    * экономики субъекта РФ
+    */
   lazy val risk2: Future[Map[(Int, Char), Double]] = {
     val q1 =
       sql"""SELECT ИДСубъекта, Буква, [Повторяемость ОЯ отрасли], [Площадь ОЯ],
@@ -106,9 +131,23 @@ object DBUtil {
     } yield (k, summap.getOrElse(k, 0.0) * vrpmap.getOrElse(k, 0.0))).toSeq: _*)
   }
 
-  def risk2ById(id: Int, some: Char): Future[Double] =
-    risk2 map (_((id, some)))
+  /**
+    * Функция, вычисляющая долю риска для конкретного сектора экономики субъекта
+    * РФ.
+    *
+    * @param id идентификатор субъекта
+    * @param sector буква, обозначающая сектор экономики
+    * @return доля риска для конкретного сектора экономики субъекта РФ.
+    */
+  def risk2ById(id: Int, sector: Char): Future[Double] =
+    risk2 map (_((id, sector)))
 
+  /**
+    * Отображение, необходимое для вычисления индекса погодно-климатического
+    * риска для социальной сферы субъекта РФ.
+    * @param norm нормирующая функция
+    * @return отображение "ид субъекта -> социальный риск"
+    */
   def risk3(norm: List[Double] => List[Double]): Future[Map[Int, Double]] = {
     // Get subjects' area
     val q1 = for {
@@ -132,7 +171,7 @@ object DBUtil {
     } yield q2vec map {
       case (id, p, s, t, k) => (id.toInt, p * t * k * (if (s > areaMap(id.toInt)) 1.0 else s / areaMap(id.toInt)))
     } groupBy (_._1) map {
-      case (id, vec) => (id, vec.unzip._2.sum)
+      case (id, vec) => (id, vec.map(_._2).sum)
     }
 
     // Factors
@@ -175,9 +214,20 @@ object DBUtil {
     } yield (k, sumMap.getOrElse(k, 0.0) * factPartMap.getOrElse(k, 0.0))).toSeq: _*)
   }
 
+  /**
+    * Функция, вычисляющая социальный риск для конкретного субъекта РФ
+    * @param norm функция нормирования
+    * @param id идентификатор субъекта РФ
+    * @return значение социального риска для субъекта РФ
+    */
   def risk3ById(norm: List[Double] => List[Double], id: Int): Future[Double] =
     risk3(norm) map (_(id))
 
+  /**
+    * Добавление недостающих строк в базу данных
+    * @param rows список строк, подлежащих добавлению в базу
+    * @return
+    */
   def addMissingRowsToDB(rows: List[XLSRow]): Future[Unit] = {
     InputData.makeDBBackup()
 
@@ -187,7 +237,7 @@ object DBUtil {
       oyalist <- СписокОпасныхЯвлений if oya.номерЯвления === oyalist.номерЯвления
       subj <- СубъектыРф if oya.идсубъекта === subj.идсубъекта
     } yield (oya.номер, oyalist.названиеОпасногоЯвления, subj.назсубъекта)
-    //} yield (oya.номер, oya.номерЯвления, oya.идсубъекта)
+
     val keysF = db.run(keysQ.result) map (_ map {
       case (id, oname, sname) => (id.toInt, oname, sname)
     })
@@ -202,7 +252,6 @@ object DBUtil {
       toadd
     })
 
-    //val abc = rowsAreContained map (list =>
     val actionsList = for {
       list <- rowsAreContained
       oyamap <- oyaIdByName
@@ -216,7 +265,7 @@ object DBUtil {
           Some(xlsrow.earliness),
           oyamap(xlsrow.name), // номерявления: Int
           Some(xlsrow.intensivity),
-          subjmap(xlsrow.subjName), // идсубъекта: String
+          subjmap(xlsrow.subjName).toString, // идсубъекта: String
           Some(xlsrow.comment)
         ))
 
