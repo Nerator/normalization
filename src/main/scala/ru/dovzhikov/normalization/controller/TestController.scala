@@ -58,25 +58,21 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     headerText = "Enter letter"
   }
 
-  //val choices = DBUtil.letters
-//  def cd(ch: Seq[String], header: String): ChoiceDialog[String] =
   private def cd[T](ch: Seq[T], header: String): ChoiceDialog[T] =
     new ChoiceDialog(defaultChoice = ch.head, choices = ch) {
       headerText = header // "Choose letter"
     }
 
   // CC for b2
-  case class Cc(a: Int, b: Char)
+  case class Risk2Input(a: Int, b: Char)
+
   // Dialog for button2
-  val b2dialog: Dialog[(Int, Char)] = {
-  //val b2dialog: Dialog[Cc] = {
-    val dialog = new Dialog[(Int, Char)]() {
-    //val dialog = new Dialog[Cc]() {
-      //title = "Login Dialog"
+  val b2dialog: Dialog[Risk2Input] = {
+    val dialog = new Dialog[Risk2Input]() {
       headerText = "Choose subject and wing"
     }
 
-    val loginButtonType = new ButtonType("Login", ButtonData.OKDone)
+    val loginButtonType = new ButtonType("OK", ButtonData.OKDone)
     dialog.dialogPane().buttonTypes = Seq(loginButtonType, ButtonType.Cancel)
 
     val cb1 = new scalafx.scene.control.ComboBox(DBUtil.subjects map (_._2)) {
@@ -94,7 +90,7 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
 
       add(new Label("Subject:"), 0, 0)
       add(cb1, 1, 0)
-      add(new Label("Password:"), 0, 1)
+      add(new Label("Wing:"), 0, 1)
       add(cb2, 1, 1)
     }
 
@@ -102,16 +98,62 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
 
     dialog.resultConverter = dialogButton =>
       if (dialogButton == loginButtonType) {
-        val s = DBUtil.subjects.find(_._2 == cb1.getValue).map(_._1)
-        val l = DBUtil.letters.find(_._2 == cb2.getValue).map(_._1)
+        val sO = DBUtil.subjects.find(_._2 == cb1.getValue).map(_._1)
+        val lO = DBUtil.letters.find(_._2 == cb2.getValue).map(_._1)
         val sl = for {
-          ss <- s
-          ll <- l
-        } yield (ss,ll)
-        if (sl.isDefined) (sl.get._1, sl.get._2)
-        else null
+          s <- sO
+          l <- lO
+        } yield (s,l)
+        sl map { case (s,l) => Risk2Input(s,l) } orNull
       } else
         null
+
+    dialog
+  }
+
+  // CC for r3
+  case class Risk3Input(subj: Int, fun: List[Double] => List[Double])
+
+  // Dialog for button3
+  val b3dialog: Dialog[Risk3Input] = {
+    val dialog = new Dialog[Risk3Input]() {
+      headerText = "Choose subject and wing"
+    }
+
+    val loginButtonType = new ButtonType("OK", ButtonData.OKDone)
+    dialog.dialogPane().buttonTypes = Seq(loginButtonType, ButtonType.Cancel)
+
+    val cb1 = new scalafx.scene.control.ComboBox(DBUtil.subjects map (_._2)) {
+      editable = false
+    }
+
+    val cb2 = new scalafx.scene.control.ComboBox(Normalization.methods map (_.name)) {
+      editable = false
+    }
+
+    val grid = new GridPane() {
+      hgap = 10
+      vgap = 10
+      padding = Insets(20, 100, 10, 10)
+
+      add(new Label("Subject:"), 0, 0)
+      add(cb1, 1, 0)
+      add(new Label("Method:"), 0, 1)
+      add(cb2, 1, 1)
+    }
+
+    dialog.dialogPane().content = grid
+
+    dialog.resultConverter = dialogButton =>
+      if (dialogButton == loginButtonType) {
+        val sO = DBUtil.subjects find (_._2 == cb1.getValue) map (_._1)
+        val fO = Normalization.methods find (_.name == cb2.getValue) map (_.f)
+        val sn = for {
+          s <- sO
+          f <- fO
+        } yield (s,f)
+        sn map { case (s,f) => Risk3Input(s,f) } orNull
+      } else null
 
     dialog
   }
@@ -134,23 +176,10 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
   }
 
   def button2Handle(ae: ActionEvent): Unit = {
-    //    val selection = cd(DBUtil.subjects map (_._2), "Choose subject")
-    //      .showAndWait()
-    //      .map(sn => DBUtil.subjects.filter(t => t._2 == sn).head._1)
-    //    val letter = cd(DBUtil.letters map (_._2), "Choose wing")
-    //      .showAndWait()
-    //      .map(wn => DBUtil.letters.filter(t => t._2 == wn).head._1)
-//    val sl = b2dialog.showAndWait()(new DConvert[(Int, Char), ((Int, Char)) => (Int, Char)] {
-//      type S = (Int, Char)
-//      override def apply(t: (Int, Char), f: ((Int, Char)) => (Int, Char)): (Int, Char) = t
-//    })
-    //implicit val abc = DConvert.t2r[(Int, Char), (Int, Char)]
-    //val sl = b2dialog.showAndWait[((Int, Char)) => (Int, Char)]()
     val sl = b2dialog.showAndWait()
-    sl foreach { case Some((s, l)) =>
+    sl foreach { case Risk2Input(s, l) =>
         qal.show()
-        // TODO: need case class to store result...
-        DBUtil.risk2ById(s.asInstanceOf[Int], l.asInstanceOf[Char]) andThen {
+        DBUtil.risk2ById(s, l) andThen {
           case _ => qal.close()
         } onComplete {
           case Success(risk) =>
@@ -160,41 +189,13 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
             new Alert(AlertType.Error, s"Error: ${ex.getMessage}").showAndWait()
         }
     }
-    //sl foreach (((s, l)): (Int, Char)) =>    )
-
-//    for {
-//      sel <- selection
-//      let <- letter
-//    } {
-//      qal.show()
-//      DBUtil.risk2ById(sel, let) andThen {
-//        case _ => qal.close()
-//      } onComplete {
-//        case Success(risk) =>
-//          new Alert(AlertType.Information, s"Risk: $risk").showAndWait()
-//        case Failure(ex) =>
-//          ex.printStackTrace()
-//          new Alert(AlertType.Error, s"Error: ${ex.getMessage}").showAndWait()
-//      }
-//    }
-
   }
 
   def button3Handle(ae: ActionEvent): Unit = {
-    val selection = cd(DBUtil.subjects.map(_._2), "Choose subject")
-      .showAndWait()
-      .map(sn => DBUtil.subjects.filter(t => t._2 == sn).head._1)
-    // TODO: Normalization methods
-    val method = cd(Normalization.methods, "Choose method")
-        .showAndWait()
-        .map(_.f)
-    //selection foreach (s => {
-    for {
-      sel <- selection
-      m <- method
-    } {
+    val sn = b3dialog.showAndWait()
+    sn foreach { case Risk3Input(s,n) =>
       qal.show()
-      DBUtil.risk3ById(m, sel) andThen {
+      DBUtil.risk3ById(n, s) andThen {
         case _ => qal.close()
       } onComplete {
         case Success(risk) =>
