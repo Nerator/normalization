@@ -9,9 +9,9 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
 import scalafx.geometry.Insets
+import scalafx.scene.control.{Alert, ButtonType, ChoiceDialog, Dialog, Label, TextInputDialog}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
-import scalafx.scene.control._
 import scalafx.scene.layout.{BorderPane, GridPane}
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
