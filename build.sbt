@@ -77,16 +77,16 @@ lazy val root = (project in file(".")).
       //"org.scalafx"        %% "scalafx"             % "8.0.102-R11",
       "org.scalafx"        %% "scalafx"             % "11-R16",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
-      "com.github.junrar"   % "junrar"              % "2.0.0",
-      "org.apache.poi"      % "poi"                 % "4.0.1",
-      "org.apache.poi"      % "poi-ooxml"           % "4.0.1",
-      "org.apache.poi"      % "poi-ooxml-schemas"   % "4.0.1",
-      "com.typesafe.slick" %% "slick"               % "3.2.3",
+      "com.github.junrar"   % "junrar"              % "4.0.0",
+      "org.apache.poi"      % "poi"                 % "4.1.0",
+      "org.apache.poi"      % "poi-ooxml"           % "4.1.0",
+      "org.apache.poi"      % "poi-ooxml-schemas"   % "4.1.0",
+      "com.typesafe.slick" %% "slick"               % "3.3.0",
       //"com.typesafe.slick" %% "slick-codegen"       % ver,
-      "org.slf4j"           % "slf4j-nop"           % "1.6.4",
-      "com.typesafe.slick" %% "slick-hikaricp"      % "3.2.3",
-      "org.xerial"          % "sqlite-jdbc"         % "3.23.1",
-      "org.scalatest"      %% "scalatest"           % "3.0.5" % Test
+      "org.slf4j"           % "slf4j-nop"           % "1.7.9",
+      "com.typesafe.slick" %% "slick-hikaricp"      % "3.3.0",
+      "org.xerial"          % "sqlite-jdbc"         % "3.27.2.1",
+      "org.scalatest"      %% "scalatest"           % "3.0.7" % Test
     ),
     
     // set the main class for the main 'run' task
