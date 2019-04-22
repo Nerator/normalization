@@ -155,7 +155,7 @@ object DBUtil {
     } yield (ss.идсубъекта, ss.площадь)
 
     val area = db.run(q1.result) map (seq => Map(seq map {
-      case (sid, a) => (sid.toInt, a.get)
+      case (sid, a) => (sid.toInt, a.getOrElse(0.0))
     }: _*))
 
     // Get sum parameters and sum value
@@ -228,7 +228,7 @@ object DBUtil {
     * @param rows список строк, подлежащих добавлению в базу
     * @return
     */
-  def addMissingRowsToDB(rows: List[XLSRow]): Future[Unit] = {
+  def addMissingRowsToDB(rows: List[XLSRow]): Future[Int] = {
     InputData.makeDBBackup()
 
     // Query to get keys
@@ -270,7 +270,8 @@ object DBUtil {
         ))
 
     println("got future")
-    actionsList flatMap (dbaction => db.run(DBIO.seq(dbaction: _*)))
+
+    actionsList flatMap (dbActions => db.run(DBIO.sequence(dbActions))) map (_.sum)
   }
 
   lazy val letters: Seq[(Char, String)] = {

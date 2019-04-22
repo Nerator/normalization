@@ -213,8 +213,8 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     DBUtil.addMissingRowsToDB(rows) andThen {
       case _ => qal.close()
     } onComplete {
-      case Success(_) =>
-        new Alert(AlertType.Information, s"Successfully imported missing values").showAndWait()
+      case Success(added) =>
+        new Alert(AlertType.Information, s"Successfully imported $added missing values").showAndWait()
       case Failure(ex) =>
         new Alert(AlertType.Error, s"Error: ${ex.getMessage}").showAndWait()
     }
