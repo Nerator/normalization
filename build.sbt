@@ -1,3 +1,13 @@
+// For JavaFX
+val osName: SettingKey[String] = SettingKey[String]("osName")
+
+osName := (System.getProperty("os.name") match {
+    case name if name.startsWith("Linux") => "linux"
+    case name if name.startsWith("Mac") => "mac"
+    case name if name.startsWith("Windows") => "win"
+    case _ => throw new Exception("Unknown platform!")
+})
+
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
@@ -57,8 +67,15 @@ lazy val root = (project in file(".")).
     resolvers += Resolver.sonatypeRepo("releases"),
     addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
     libraryDependencies ++= Seq(
-      "org.scalanlp"       %% "breeze"              % "1.0-RC2",
-      "org.scalafx"        %% "scalafx"             % "8.0.102-R11",
+      // JavaFX 11
+      "org.openjfx"         % "javafx-base"         % "11.0.2" classifier osName.value,
+      "org.openjfx"         % "javafx-controls"     % "11.0.2" classifier osName.value,
+      "org.openjfx"         % "javafx-fxml"         % "11.0.2" classifier osName.value,
+      "org.openjfx"         % "javafx-graphics"     % "11.0.2" classifier osName.value,
+      "org.openjfx"         % "javafx-media"        % "11.0.2" classifier osName.value,
+      //"org.scalanlp"       %% "breeze"              % "1.0-RC2",
+      //"org.scalafx"        %% "scalafx"             % "8.0.102-R11",
+      "org.scalafx"        %% "scalafx"             % "11-R16",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
       "com.github.junrar"   % "junrar"              % "2.0.0",
       "org.apache.poi"      % "poi"                 % "4.0.1",
@@ -107,3 +124,15 @@ Compile / scalacOptions ++= {
     case _      => Nil
   }
 }
+  
+// add javafx-swing in 2.11
+ThisBuild / libraryDependencies ++= {
+  scalaBinaryVersion.value match {
+    case "2.11" => Seq(
+      "org.openjfx" % "javafx-swing" % "11.0.2" classifier osName.value,
+      "org.openjfx" % "javafx-web"   % "11.0.2" classifier osName.value
+      )
+    case _      => Nil
+  }
+}
+
