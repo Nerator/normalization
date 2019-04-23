@@ -9,7 +9,7 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
 import scalafx.geometry.Insets
-import scalafx.scene.control.{Alert, ButtonType, ChoiceDialog, Dialog, Label, TextInputDialog}
+import scalafx.scene.control.{Alert, ButtonType, ChoiceDialog, ComboBox, Dialog, Label, TextInputDialog}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.layout.{BorderPane, GridPane}
@@ -75,11 +75,11 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     val loginButtonType = new ButtonType("OK", ButtonData.OKDone)
     dialog.dialogPane().buttonTypes = Seq(loginButtonType, ButtonType.Cancel)
 
-    val cb1 = new scalafx.scene.control.ComboBox(DBUtil.subjects map (_._2)) {
+    val cb1 = new ComboBox(DBUtil.subjects map (_._2)) {
       editable = false
     }
 
-    val cb2 = new scalafx.scene.control.ComboBox(DBUtil.letters map (_._2)) {
+    val cb2 = new ComboBox(DBUtil.letters map (_._2)) {
       editable = false
     }
 
@@ -123,11 +123,11 @@ class TestController(private val bpane: BorderPane) extends TestControllerInterf
     val loginButtonType = new ButtonType("OK", ButtonData.OKDone)
     dialog.dialogPane().buttonTypes = Seq(loginButtonType, ButtonType.Cancel)
 
-    val cb1 = new scalafx.scene.control.ComboBox(DBUtil.subjects map (_._2)) {
+    val cb1 = new ComboBox(DBUtil.subjects map (_._2)) {
       editable = false
     }
 
-    val cb2 = new scalafx.scene.control.ComboBox(Normalization.methods map (_.name)) {
+    val cb2 = new ComboBox(Normalization.methods map (_.name)) {
       editable = false
     }
 
