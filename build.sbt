@@ -2,9 +2,9 @@
 val osName: SettingKey[String] = SettingKey[String]("osName")
 
 osName := (System.getProperty("os.name") match {
-    case name if name.startsWith("Linux") => "linux"
-    case name if name.startsWith("Mac") => "mac"
-    case name if name.startsWith("Windows") => "win"
+    case n if n.startsWith("Linux") => "linux"
+    case n if n.startsWith("Mac") => "mac"
+    case n if n.startsWith("Windows") => "win"
     case _ => throw new Exception("Unknown platform!")
 })
 
@@ -74,13 +74,12 @@ lazy val root = (project in file(".")).
       "org.openjfx"         % "javafx-graphics"     % "11.0.2" classifier osName.value,
       "org.openjfx"         % "javafx-media"        % "11.0.2" classifier osName.value,
       //"org.scalanlp"       %% "breeze"              % "1.0-RC2",
-      //"org.scalafx"        %% "scalafx"             % "8.0.102-R11",
       "org.scalafx"        %% "scalafx"             % "11-R16",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
       "com.github.junrar"   % "junrar"              % "4.0.0",
       "org.apache.poi"      % "poi"                 % "4.1.0",
-      "org.apache.poi"      % "poi-ooxml"           % "4.1.0",
-      "org.apache.poi"      % "poi-ooxml-schemas"   % "4.1.0",
+      //"org.apache.poi"      % "poi-ooxml"           % "4.1.0",
+      //"org.apache.poi"      % "poi-ooxml-schemas"   % "4.1.0",
       "com.typesafe.slick" %% "slick"               % "3.3.0",
       //"com.typesafe.slick" %% "slick-codegen"       % ver,
       "org.slf4j"           % "slf4j-nop"           % "1.7.9",
