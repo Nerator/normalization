@@ -4,10 +4,10 @@ import org.scalatest._
 
 import java.io.File
 
-import org.scalatest.concurrent.{Futures, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
-class InputDataSpec extends FlatSpec with Matchers with Futures with ScalaFutures {
+class InputDataSpec extends FlatSpec with Matchers with ScalaFutures {
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(5, Millis))

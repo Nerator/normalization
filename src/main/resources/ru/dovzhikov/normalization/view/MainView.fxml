@@ -1,38 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.paint.LinearGradient?>
-<?import javafx.scene.paint.Stop?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.Font?>
 
-<HBox style="-fx-background-color: #262626;" xmlns="http://javafx.com/javafx/8.0.72"
->
-   <padding>
-      <Insets bottom="50.0" left="80.0" right="80.0" top="50.0"/>
-   </padding>
-   <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font: normal bold 100pt sans-serif;" text="Scala">
-      <fill>
-         <LinearGradient>
-            <stops>
-               <Stop color="RED"/>
-               <Stop color="DARKRED" offset="1.0"/>
-            </stops>
-         </LinearGradient>
-      </fill>
-   </Text>
-   <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font: italic bold 100pt sans-serif;" text="FX">
-      <effect>
-         <DropShadow color="DARKGRAY" spread="0.15"/>
-      </effect>
-      <fill>
-         <LinearGradient>
-            <stops>
-               <Stop color="WHITE"/>
-               <Stop color="DARKGRAY" offset="1.0"/>
-            </stops>
-         </LinearGradient>
-      </fill>
-   </Text>
-</HBox>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.dovzhikov.normalization.controller.MainController">
+   <top>
+       <MenuBar BorderPane.alignment="CENTER">
+           <Menu mnemonicParsing="false" text="Файл">
+               <MenuItem mnemonicParsing="false" onAction="#openDBMenuAction" text="Открыть базу">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></MenuItem>
+               <MenuItem mnemonicParsing="false" onAction="#closeMenuAction" text="Выход">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></MenuItem>
+           </Menu>
+           <Menu mnemonicParsing="false" text="Данные">
+            <items>
+               <Menu mnemonicParsing="false" text="Добавление данных об ОЯ">
+                 <items>
+                   <MenuItem mnemonicParsing="false" onAction="#importFileMenuAction" text="из файла" />
+                     <MenuItem mnemonicParsing="false" onAction="#importInternetMenuAction" text="из Интернета" />
+                 </items>
+               </Menu>
+            </items>
+           </Menu>
+         <Menu mnemonicParsing="false" text="Расчёт рисков">
+           <items>
+               <Menu mnemonicParsing="false" text="Индекс риска для экономики">
+                 <items>
+                   <MenuItem mnemonicParsing="false" onAction="#risk1AllMenuAction" text="Для всех субъектов" />
+                     <MenuItem mnemonicParsing="false" onAction="#risk1SubjMenuAction" text="Для конкретного субъекта" />
+                 </items>
+               </Menu>
+               <Menu mnemonicParsing="false" text="Доля риска для сектора экономики">
+                 <items>
+                   <MenuItem mnemonicParsing="false" onAction="#risk2AllMenuAction" text="Для всех субъектов и отраслей" />
+                     <MenuItem mnemonicParsing="false" onAction="#risk2SubjMenuAction" text="Для конкретного субъекта" />
+                     <MenuItem mnemonicParsing="false" onAction="#risk2WingMenuAction" text="Для конкретной отрасли" />
+                     <MenuItem mnemonicParsing="false" onAction="#risk2SubjWingMenuAction" text="Для конкретного субъекта и отрасли" />
+                 </items>
+               </Menu>
+               <Menu mnemonicParsing="false" text="Индекс риска для социальной сферы">
+                 <items>
+                   <MenuItem mnemonicParsing="false" onAction="#risk3AllMenuAction" text="Для всех субъектов" />
+                     <MenuItem mnemonicParsing="false" onAction="#risk3SubjMethodMenuAction" text="Для конкретного субъекта и способа нормирования" />
+                 </items>
+               </Menu>
+           </items>
+         </Menu>
+         <Menu mnemonicParsing="false" text="Анализ">
+             <items>
+                  <MenuItem mnemonicParsing="false" onAction="#chartMenuAction" text="Графики для нормирования" />
+             </items>
+         </Menu>
+       </MenuBar>
+   </top>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <top>
+            <Label text="Автоматизация нормирования" textAlignment="CENTER" BorderPane.alignment="CENTER">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+         </top>
+      </BorderPane>
+   </center>
+   <bottom>
+      <HBox id="status_bar" alignment="CENTER_LEFT" prefHeight="20.0" stylesheets="@style.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel" text="Label" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

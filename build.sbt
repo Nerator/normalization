@@ -8,8 +8,9 @@ osName := (System.getProperty("os.name") match {
     case _ => throw new Exception("Unknown platform!")
 })
 
-lazy val root = (project in file(".")).
-  settings(
+lazy val root = (project in file("."))
+  .enablePlugins(JavaAppPackaging)
+  .settings(
     inThisBuild(List(
       organization       := "ru.dovzhikov",
       scalaVersion       := "2.12.8",
@@ -87,11 +88,11 @@ lazy val root = (project in file(".")).
       "org.xerial"          % "sqlite-jdbc"         % "3.27.2.1",
       "org.scalatest"      %% "scalatest"           % "3.0.7" % Test
     ),
-    
+
     // set the main class for the main 'run' task
     // change Compile to Test to set it for 'test:run'
-    mainClass in (Compile, run) := Some("ru.dovzhikov.normalization.TestFXML"),
-    
+    mainClass in (Compile, run) := Some("ru.dovzhikov.normalization.MainApp"),
+
     // Fork a new JVM for 'run' and 'test:run' to avoid JavaFX double initialization problems
     fork := true
   )
@@ -123,7 +124,7 @@ Compile / scalacOptions ++= {
     case _      => Nil
   }
 }
-  
+
 // add javafx-swing in 2.11
 ThisBuild / libraryDependencies ++= {
   scalaBinaryVersion.value match {
@@ -135,3 +136,11 @@ ThisBuild / libraryDependencies ++= {
   }
 }
 
+lazy val packageVer = taskKey[File]("package zip file")
+
+packageVer := {
+  val output = baseDirectory.value / "package" / s"normalization_${(scalaBinaryVersion in root).value}-${(version in root).value}.zip"
+  val genfile = (packageBin in Universal).value
+  IO.move(genfile, output)
+  output
+}

@@ -1,23 +1,24 @@
 package ru.dovzhikov.normalization.model.db
 
-import ru.dovzhikov.normalization.model.db.Tables._
+import java.io.File
+import java.text.SimpleDateFormat
+
 import ru.dovzhikov.normalization.model.InputData
 import ru.dovzhikov.normalization.model.InputData.XLSRow
-
+import ru.dovzhikov.normalization.model.db.Tables._
 import slick.jdbc.SQLiteProfile.api._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-
-import java.text.SimpleDateFormat
+import scala.concurrent.{Await, Future}
 
 /**
   * Модуль, содержащий операции по работе с базой данных
   */
-object DBUtil {
+class DBUtil(val file: File) {
 
-  private val db = Database.forConfig("climate")
+  //private val db = Database.forConfig("climate")
+  private val db = Database.forURL(s"jdbc:sqlite:${file.getAbsolutePath}", driver = "org.sqlite.JDBC", keepAliveConnection = true)
 
   /**
     * Отображение (Map) названий субъектов РФ в числовые идентификаторы
@@ -148,7 +149,7 @@ object DBUtil {
     * @param norm нормирующая функция
     * @return отображение "ид субъекта -> социальный риск"
     */
-  def risk3(norm: List[Double] => List[Double]): Future[Map[Int, Double]] = {
+  def risk3(norm: Seq[Double] => Seq[Double]): Future[Map[Int, Double]] = {
     // Get subjects' area
     val q1 = for {
       ss <- СубъектыСведения
@@ -220,7 +221,7 @@ object DBUtil {
     * @param id идентификатор субъекта РФ
     * @return значение социального риска для субъекта РФ
     */
-  def risk3ById(norm: List[Double] => List[Double], id: Int): Future[Double] =
+  def risk3ById(norm: Seq[Double] => Seq[Double], id: Int): Future[Double] =
     risk3(norm) map (_(id))
 
   /**
@@ -282,13 +283,26 @@ object DBUtil {
   //    val q = РазделыЭкономики map (v => (v.раздел, v.названиеРаздела)) sortBy (_._1)
   //    db.run(q.result) map (_ map { case (l, n) => (l.take(1), n) })
   //  }
-  lazy val subjects: Seq[(Int, String)] = {
-    val q = СубъектыРф map (v => (v.идсубъекта, v.назсубъекта)) sortBy (_._1)
-    Await.result(db.run(q.result) map (_ map { case (i, n) => (i.toInt, n)}), Duration("10 sec"))
+  lazy val subjects: Seq[(Int, String, Int)] = {
+    val q = СубъектыРф map (v => (v.идсубъекта, v.назсубъекта, v.уровень)) sortBy (_._1)
+    Await.result(db.run(q.result) map (_ map { case (i, n, l) => (i.toInt, n, l.toInt)}), Duration("10 sec"))
   }
   //  lazy val subjects: Future[Seq[(String, String)]] = {
   //    val q = СубъектыРф map(v => (v.идсубъекта, v.назсубъекта)) sortBy(_._1)
   //    db.run(q.result)
   //  }
+
+  lazy val factorNames: Future[Seq[String]] = {
+    val q = Факторысоцриска map (_.названиефактора)
+    db.run(q.result)
+  }
+
+  lazy val factorVals: Future[Seq[(String,Double)]] = {
+    val q = for {
+      fs <- Факторысоцриска
+      fszs <- Факторысоцрисказначения if fszs.кодфактора === fs.кодфактора
+    } yield (fs.названиефактора, fszs.значениефактора)
+    db.run(q.result)
+  }
 
 }

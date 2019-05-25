@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.dovzhikov.normalization.controller.ChartController">
+   <center>
+      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <TitledPane collapsible="false" prefWidth="200.0" text="Источник">
+                     <content>
+                        <VBox prefHeight="20.0" prefWidth="10.0" spacing="10.0">
+                           <children>
+                              <RadioButton fx:id="baseRB" mnemonicParsing="false" onAction="#baseRBAction" text="из базы">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="src" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="fileRB" mnemonicParsing="false" onAction="#fileRBAction" text="из файла" toggleGroup="$src" />
+                           </children>
+                        </VBox>
+                     </content>
+                  </TitledPane>
+                  <Label fx:id="factOrColLabel" disable="true" />
+                  <ComboBox fx:id="factOrColCB" disable="true" onAction="#factOrColCBChanged" prefWidth="150.0" />
+                  <Label text="Метод" />
+                  <ComboBox fx:id="methodCB" onAction="#methodCBChanged" prefWidth="150.0" />
+                  <CheckBox fx:id="allMethodsCB" mnemonicParsing="false" onAction="#allMethodsAction" text="Все методы" />
+                  <Button fx:id="fileButton" disable="true" mnemonicParsing="false" onAction="#fileButtonAction" text="Файл..." />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </VBox>
+            <LineChart id="norm_chart" fx:id="chart" stylesheets="@style.css">
+               <xAxis>
+                  <CategoryAxis side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis side="LEFT" />
+               </yAxis>
+            </LineChart>
+         </children>
+      </HBox>
+   </center>
+   <bottom>
+      <BorderPane id="status_bar" prefHeight="20.0" stylesheets="@style.css" BorderPane.alignment="CENTER">
+         <left>
+            <Label fx:id="sourceLabel" text="Label" BorderPane.alignment="CENTER" />
+         </left>
+         <right>
+            <Label fx:id="modeLabel" text="Label" BorderPane.alignment="CENTER" />
+         </right>
+      </BorderPane>
+   </bottom>
+</BorderPane>
