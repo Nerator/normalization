@@ -81,10 +81,10 @@ lazy val root = (project in file("."))
       "org.apache.poi"      % "poi"                 % "4.1.0",
       //"org.apache.poi"      % "poi-ooxml"           % "4.1.0",
       //"org.apache.poi"      % "poi-ooxml-schemas"   % "4.1.0",
-      "com.typesafe.slick" %% "slick"               % "3.3.0",
+      "com.typesafe.slick" %% "slick"               % "3.3.1",
       //"com.typesafe.slick" %% "slick-codegen"       % ver,
       "org.slf4j"           % "slf4j-nop"           % "1.7.9",
-      "com.typesafe.slick" %% "slick-hikaricp"      % "3.3.0",
+      "com.typesafe.slick" %% "slick-hikaricp"      % "3.3.1",
       "org.xerial"          % "sqlite-jdbc"         % "3.27.2.1",
       "org.scalatest"      %% "scalatest"           % "3.0.7" % Test
     ),
