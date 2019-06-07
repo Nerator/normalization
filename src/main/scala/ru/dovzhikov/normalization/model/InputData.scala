@@ -2,7 +2,6 @@ package ru.dovzhikov.normalization.model
 
 import java.io.{File, FileInputStream}
 import java.net.URL
-import java.nio.file.{Files, Paths, StandardCopyOption}
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -143,22 +142,22 @@ object InputData {
     })
   }
 
-  def makeDBBackup(): Unit = {
-    val db = new File("climate.db")
-    require(db.exists)
-    def bakName(number: Int = 0): String = {
-      val name = s"climate.db.bak.$number"
-      if (new File(name).exists())
-        bakName(number+1)
-      else
-        name
-    }
-    val bname = bakName()
-    val path = Files.copy(Paths.get("climate.db"), Paths.get(bname), StandardCopyOption.REPLACE_EXISTING)
-    if (path == null)
-      println("Error: could not copy")
-    else
-      println(s"Copied successfully to $bname")
-  }
+//  def makeDBBackup(): Unit = {
+//    val db = new File("climate.db")
+//    require(db.exists)
+//    def bakName(number: Int = 0): String = {
+//      val name = s"climate.db.bak.$number"
+//      if (new File(name).exists())
+//        bakName(number+1)
+//      else
+//        name
+//    }
+//    val bname = bakName()
+//    val path = Files.copy(Paths.get("climate.db"), Paths.get(bname), StandardCopyOption.REPLACE_EXISTING)
+//    if (path == null)
+//      println("Error: could not copy")
+//    else
+//      println(s"Copied successfully to $bname")
+//  }
 
 }

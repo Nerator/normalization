@@ -3,7 +3,6 @@ package ru.dovzhikov.normalization.model.db
 import java.io.File
 import java.text.SimpleDateFormat
 
-import ru.dovzhikov.normalization.model.InputData
 import ru.dovzhikov.normalization.model.InputData.XLSRow
 import ru.dovzhikov.normalization.model.db.Tables._
 import slick.jdbc.SQLiteProfile.api._
@@ -53,15 +52,13 @@ class DBUtil(val file: File) {
       ss <- СубъектыСведения
     } yield (ss.идсубъекта, ss.площадь, ss.врп)
 
-    val areaVrp = {
-      val qres = db.run(q2.result).map(_.map {
-        case (id, ar, v) => (id.toInt, ar.get, v.get)
-      })
-      val unzipped = qres.map(_.unzip3)
-      unzipped map {
-        case (ids, ars, vs) => (Map(ids zip ars: _*), Map(ids zip vs: _*))
-      }
-    }
+    val areaVrp =
+      for (qres <- db.run(q2.result))
+        yield {
+          val seq = for ((id, ar, v) <- qres)
+            yield (id.toInt -> ar.get, id.toInt -> v.get)
+          (Map(seq map (_._1): _*), Map(seq map (_._2): _*))
+        }
 
     val sum = for {
       (areaMap, _) <- areaVrp
@@ -230,8 +227,6 @@ class DBUtil(val file: File) {
     * @return
     */
   def addMissingRowsToDB(rows: List[XLSRow]): Future[Int] = {
-    InputData.makeDBBackup()
-
     // Query to get keys
     val keysQ = for {
       oya <- ОпасныеЯвления
