@@ -1,7 +1,7 @@
 package ru.dovzhikov.normalization.model.db
 
 import java.io.File
-import java.nio.file.{Files, Path, StandardCopyOption}
+import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
@@ -66,10 +66,12 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
     }
   }
 
-  "addMissingRowsToDB" should "work correctly" in  { // takes ~ 5 minutes...
+  "addMissingRowsToDB" should "work correctly" in { // takes ~ 5 minutes...
     // copy db
-    val in = Path.of(dbFile.toURI)
-    val out = Path.of(dbFile.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
+//    val in = Path.of(dbFile.toURI)
+    val in = Paths.get(dbFile.toURI)
+//    val out = Path.of(dbFile.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
+    val out = Paths.get(dbFile.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
     Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING)
     val testDB = new DBUtil(new File(getClass.getResource("/db-test/climate-copy.db").toURI))
     val rows = InputData.getValues(new File(getClass.getResource("/xls-test/ojdamage_rus.xls").toURI))
