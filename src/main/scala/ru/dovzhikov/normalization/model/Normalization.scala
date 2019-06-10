@@ -2,11 +2,11 @@ package ru.dovzhikov.normalization.model
 
 object Normalization {
 
-  def meanAndStdev(l: Seq[Double]): (Double, Double) = {
+  def meanAndVariance(l: Seq[Double]): (Double, Double) = {
     val len = l.length
     val mean = l.sum / len
-    val std = math.sqrt(l.map(v => math.pow(v - mean, 2.0)).sum / (len - 1))
-    (mean, std)
+    val variance = l.map(v => math.pow(v - mean, 2.0)).sum / (len - 1)
+    (mean, variance)
   }
 
   def minmax(l: Seq[Double]): Seq[Double] = {
@@ -16,7 +16,8 @@ object Normalization {
   }
 
   def standardScore(l: Seq[Double]): Seq[Double] = {
-    val (m, sd) = meanAndStdev(l)
+    val (m, vr) = meanAndVariance(l)
+    val sd = math.sqrt(vr)
     l map (v => (v - m) / sd)
   }
 

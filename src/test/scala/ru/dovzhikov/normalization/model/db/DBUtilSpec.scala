@@ -6,6 +6,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time._
+
 import ru.dovzhikov.normalization.model.{InputData, Normalization}
 
 class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
@@ -13,8 +14,7 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(10, Minutes), interval = Span(5, Millis))
 
-  val dbFile = new File(getClass.getResource("/db-test/climate.db").toURI)
-  val db = new DBUtil(dbFile)
+  val db = new DBUtil(new File(getClass.getResource("/db-test/climate.db").toURI))
 
   "subjIdByName" should "work correctly" in {
     whenReady(db.subjIdByName) { map =>
@@ -68,9 +68,10 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
 
   "addMissingRowsToDB" should "work correctly" in { // takes ~ 5 minutes...
     // copy db
-    val in = Paths.get(dbFile.toURI)
-    val out = Paths.get(dbFile.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
+    val in = Paths.get(db.file.toURI)
+    val out = Paths.get(db.file.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
     Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING)
+    // create DBUtil with copy and perform test
     val testDB = new DBUtil(new File(getClass.getResource("/db-test/climate-copy.db").toURI))
     val rows = InputData.getValues(new File(getClass.getResource("/xls-test/ojdamage_rus.xls").toURI))
     whenReady(testDB.addMissingRowsToDB(rows)) { amount =>
@@ -81,20 +82,26 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
 
   "letters" should "work correctly" in {
     val let = db.letters
-    let(0) shouldEqual (('А', "Сельское хозяйство, охота и лесное хозяйство"))
-    let(1) shouldEqual (('Б', "Рыболовство, рыбоводство"))
-    let(2) shouldEqual (('В', "Добыча полезных ископаемых"))
-    let(3) shouldEqual (('Г', "Обрабатывающие производства"))
-    let(4) shouldEqual (('Д', "Производство и распределение электроэнергии, газа и воды"))
+    val expected = Seq(
+      ('А', "Сельское хозяйство, охота и лесное хозяйство"),
+      ('Б', "Рыболовство, рыбоводство"),
+      ('В', "Добыча полезных ископаемых"),
+      ('Г', "Обрабатывающие производства"),
+      ('Д', "Производство и распределение электроэнергии, газа и воды")
+    )
+    let take 5 shouldEqual expected
   }
 
   "subjects" should "work correctly" in {
     val subj = db.subjects
-    subj(0) shouldEqual ((1000, "Российская Федерация", 1))
-    subj(1) shouldEqual ((1100, "Центральный федеральный округ", 2))
-    subj(2) shouldEqual ((1101, "Белгородская область", 3))
-    subj(3) shouldEqual ((1102, "Брянская область", 3))
-    subj(4) shouldEqual ((1103, "Владимирская область", 3))
+    val expected = Seq(
+      (1000, "Российская Федерация", 1),
+      (1100, "Центральный федеральный округ", 2),
+      (1101, "Белгородская область", 3),
+      (1102, "Брянская область", 3),
+      (1103, "Владимирская область", 3)
+    )
+    subj take 5 shouldEqual expected
   }
 
 }

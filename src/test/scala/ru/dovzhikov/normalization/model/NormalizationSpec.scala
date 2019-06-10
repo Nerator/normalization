@@ -1,10 +1,24 @@
 package ru.dovzhikov.normalization.model
 
+import org.scalacheck.Gen
 import org.scalatest._
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class NormalizationSpec extends FlatSpec with Matchers {
+class NormalizationSpec extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   private val EPS = 1e-8
+
+  // Генератор списков вещественных чисел для тестирования свойств
+  // Списки длины от 2 до 1000, со значениями в диапазонах [-1e150, -1e-150],
+  // {0.0} и [1e-150, 1e150] с ненулевой дисперсией
+  private val listGen = for {
+    numElems <- Gen.chooseNum(2, 1000)
+    neg = Gen.chooseNum(-1e150, -1e-150)
+    zero = Gen.const(0.0)
+    pos = Gen.chooseNum(1e-150, 1e150)
+    list <- Gen.listOfN(numElems, Gen.oneOf(pos, zero, neg))
+      if list.min !== list.max +- EPS
+  } yield list
 
   val values = List(
     0.4765201686,
@@ -53,17 +67,17 @@ class NormalizationSpec extends FlatSpec with Matchers {
     0.4261070562
   )
 
-  "meanAndStdev" should "work correctly" in {
-    val (mean,stdev) = Normalization.meanAndStdev(values)
-    mean shouldEqual 0.4497841828 +- EPS
-    stdev shouldEqual 0.0168163871 +- EPS // Sample LOCalc: STDEV
-    //stdev shouldEqual 0.0166241935 +- EPS // Population LOCalc: STDEV.P
+  "meanAndVariance" should "work correctly" in {
+    val (mean, variance) = Normalization.meanAndVariance(values)
+    mean shouldEqual 0.449784182806818 +- EPS
+    variance shouldEqual 0.000282790874245 +- EPS // Sample LOCalc: VAR
+    //variance shouldEqual 0.000276363808921 +- EPS // Population LOCalc: VAR.P
   }
 
   "minmax" should "work correctly" in {
     val nvalues = Normalization.minmax(values)
     val expected = List(
-      1.0         ,
+      1.0,
       0.8012050144,
       0.8470281377,
       0.8025126583,
@@ -71,17 +85,17 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.7487924662,
       0.6917698792,
       0.5071811604,
-      0.610171865 ,
+      0.610171865,
       0.8081185908,
       0.5460147567,
       0.6087156351,
       0.7289889044,
       0.7639106381,
       0.6384893918,
-      0.739845168 ,
+      0.739845168,
       0.8465308985,
       0.7049187487,
-      0.85436975  ,
+      0.85436975,
       0.6907995094,
       0.9216882494,
       0.6848810791,
@@ -90,7 +104,7 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.7079133914,
       0.8728369116,
       0.6482698569,
-      0.592303611 ,
+      0.592303611,
       0.6811522948,
       0.7830350732,
       0.6890964665,
@@ -105,60 +119,79 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.0997507259,
       0.5723582407,
       0.8171165007,
-      0.0         ,
+      0.0,
       0.373270181
     )
-    (nvalues,expected).zipped.foreach {
-      case (n,e) => n shouldEqual e +- EPS
+
+    nvalues.length shouldEqual expected.length
+    (nvalues, expected).zipped.foreach {
+      case (n, e) => n shouldEqual e +- EPS
     }
   }
 
-  "standardscore" should "work correctly" in {
+  it should "have minimum of 0 and maximum of 1 given list with at least 2 elements" in {
+    forAll(listGen) { v =>
+      val normed = Normalization.minmax(v)
+      normed.min shouldEqual 0.0
+      normed.max shouldEqual 1.0
+    }
+  }
+
+  it should "have values between 0 and 1 inclusive given list with at least 2 elements" in {
+    forAll(listGen) { v =>
+      Normalization.minmax(v) foreach { n =>
+        n should be >= 0.0
+        n should be <= 1.0
+      }
+    }
+  }
+
+  "standardScore" should "work correctly" in {
     val nvalues = Normalization.standardScore(values)
     // Sample variance (Stddev)
     val expected = List(
-       1.5898769248,
-       0.6389746586,
-       0.8581618359,
-       0.6452295528,
-       0.4464373609,
-       0.3882680791,
-       0.1155101573,
+      1.5898769248,
+      0.6389746586,
+      0.8581618359,
+      0.6452295528,
+      0.4464373609,
+      0.3882680791,
+      0.1155101573,
       -0.7674388292,
       -0.2748001738,
-       0.6720445846,
+      0.6720445846,
       -0.5816848746,
       -0.2817658038,
-       0.2935410834,
-       0.4605833031,
-      -0.139348063 ,
-       0.3454701881,
-       0.8557833764,
-       0.1784055554,
-       0.8932791994,
-       0.1108685568,
-       1.2152858814,
-       0.0825587443,
-       0.2199027896,
-       0.1157631614,
-       0.1927299233,
-       0.9816137509,
+      0.2935410834,
+      0.4605833031,
+      -0.139348063,
+      0.3454701881,
+      0.8557833764,
+      0.1784055554,
+      0.8932791994,
+      0.1108685568,
+      1.2152858814,
+      0.0825587443,
+      0.2199027896,
+      0.1157631614,
+      0.1927299233,
+      0.9816137509,
       -0.0925648587,
       -0.3602699514,
-       0.064722734 ,
-       0.5520618114,
-       0.1027223388,
-       0.6087967859,
-       0.6606539722,
-       0.3230839615,
+      0.064722734,
+      0.5520618114,
+      0.1027223388,
+      0.6087967859,
+      0.6606539722,
+      0.3230839615,
       -0.2317414833,
       -0.6093175973,
-       0.702502244 ,
+      0.702502244,
       -3.0116039697,
       -0.9059589362,
       -2.7163135569,
       -0.4556752642,
-       0.7150845684,
+      0.7150845684,
       -3.1934543208,
       -1.4079794009
     )
@@ -210,8 +243,18 @@ class NormalizationSpec extends FlatSpec with Matchers {
     //   -1.4242571601
     // )
 
-    (nvalues,expected).zipped.foreach {
-      case (n,e) => n shouldEqual e +- EPS
+    nvalues.length shouldEqual expected.length
+    (nvalues, expected).zipped.foreach {
+      case (n, e) => n shouldEqual e +- EPS
+    }
+  }
+
+  it should "have zero mean and unit variance given list with at least 2 elements" in {
+    forAll(listGen) { v =>
+      val normed = Normalization.standardScore(v)
+      val (mean, variance) = Normalization.meanAndVariance(normed)
+      mean shouldEqual 0.0 +- EPS
+      variance shouldEqual 1.0 +- EPS
     }
   }
 
@@ -223,15 +266,15 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.654521644062448,
       0.702276466023591,
       0.655934649293416,
-      0.60979185185966 ,
+      0.60979185185966,
       0.595865704971478,
       0.528845473320888,
       0.317033399185054,
       0.431729040794474,
       0.661960824977037,
-      0.35854499625712 ,
+      0.35854499625712,
       0.430020919211573,
-      0.57286282709325 ,
+      0.57286282709325,
       0.613152542555385,
       0.465219246148562,
       0.585518681863256,
@@ -240,7 +283,7 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.709566420504479,
       0.527688783251235,
       0.771232888354311,
-      0.52062797070143 ,
+      0.52062797070143,
       0.554755223563027,
       0.528908513150125,
       0.548033888629873,
@@ -260,12 +303,23 @@ class NormalizationSpec extends FlatSpec with Matchers {
       0.287827475618839,
       0.062017565784432,
       0.388012271716248,
-      0.67152368855989 ,
+      0.67152368855989,
       0.039412792809988,
       0.196552953438361
     )
-    (nvalues,expected).zipped.foreach {
-      case (n,e) => n shouldEqual e +- EPS
+
+    nvalues.length shouldEqual expected.length
+    (nvalues, expected).zipped.foreach {
+      case (n, e) => n shouldEqual e +- EPS
+    }
+  }
+
+  it should "have values between 0 and 1 given list with at least 2 elements" in {
+    forAll(listGen) { v =>
+      Normalization.sigmoid(v) foreach { n =>
+        n should be > 0.0
+        n should be < 1.0
+      }
     }
   }
 

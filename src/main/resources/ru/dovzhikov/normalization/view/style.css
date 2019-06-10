@@ -5,8 +5,6 @@
 
 #status_bar {
     -fx-border-color: lightgray;
-    /*-fx-border-color: linear-gradient(to bottom, gray, black);*/
-    /*-fx-border-insets: 5;*/
     -fx-border-width: 1;
     -fx-border-style: solid;
 }

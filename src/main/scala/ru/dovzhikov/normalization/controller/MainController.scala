@@ -11,18 +11,23 @@ import scalafx.application.Platform
 import scalafx.event.ActionEvent
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Label}
+import scalafx.scene.web.WebView
 import scalafx.stage.FileChooser
 import scalafxml.core.macros.sfxml
 
 import scala.util.{Failure, Success}
 
 @sfxml
-class MainController(statusLabel: Label) extends ControllerWithExtras {
+class MainController(statusLabel: Label, webView: WebView) extends ControllerWithExtras {
 
-  // Initialize status bar
+  // Инициализация статусной панели
   updateStatus()
 
-  // File menu handlers
+  // Загрузка инструкции
+  webView.contextMenuEnabled = false
+  webView.engine.load(getClass.getResource("/ru/dovzhikov/normalization/view/instructions.html").toExternalForm)
+
+  // Обработчики меню Файл
 
   def openDBMenuAction(ae: ActionEvent): Unit = {
     val selectedFile = new FileChooser {
@@ -40,7 +45,7 @@ class MainController(statusLabel: Label) extends ControllerWithExtras {
     Platform.exit()
   }
 
-  // Data menu handlers
+  // Обработчики меню Данные
 
   def importFileMenuAction(ae: ActionEvent): Unit = {
     val fileChooser = new FileChooser {
@@ -66,7 +71,7 @@ class MainController(statusLabel: Label) extends ControllerWithExtras {
     } processXLS(xls)
   }
 
-  // Risk menu handlers
+  // Обработчики меню рисков
 
   def risk1AllMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
@@ -168,12 +173,12 @@ class MainController(statusLabel: Label) extends ControllerWithExtras {
     }
   }
 
-  // Analysis menu handlers
+  // Обработчики меню анализа
 
   def chartMenuAction(ae: ActionEvent): Unit =
     new ChartStage(currentDB).show()
 
-  // Private methods
+  // Приватные методы
 
   private def processXLS(xls: File): Unit = {
     currentDB.fold[Unit] {

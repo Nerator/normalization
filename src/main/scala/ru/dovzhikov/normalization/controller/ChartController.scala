@@ -31,12 +31,13 @@ class ChartController(baseRB: RadioButton,
   var currentCSVData: Option[Seq[CSV.Column]] = None
   var currentData: Option[Seq[(String, Double)]] = None
 
+  // Инициализация статусной панели
   updateStatus()
 
   methodCB.items = ObservableBuffer(Normalization.methods)
   methodCB.selectionModel().selectFirst()
 
-  // HANDLERS
+  // Обрабочики
 
   def closeMenuHandle(ae: ActionEvent): Unit = {
     stage.close()

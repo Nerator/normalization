@@ -74,6 +74,7 @@ lazy val root = (project in file("."))
       "org.openjfx"         % "javafx-fxml"         % "11.0.2" classifier osName.value,
       "org.openjfx"         % "javafx-graphics"     % "11.0.2" classifier osName.value,
       "org.openjfx"         % "javafx-media"        % "11.0.2" classifier osName.value,
+      "org.openjfx"         % "javafx-web"          % "11.0.2" classifier osName.value,
       //"org.scalanlp"       %% "breeze"              % "1.0-RC2",
       "org.scalafx"        %% "scalafx"             % "11-R16",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
@@ -86,7 +87,8 @@ lazy val root = (project in file("."))
       "org.slf4j"           % "slf4j-nop"           % "1.7.9",
       "com.typesafe.slick" %% "slick-hikaricp"      % "3.3.1",
       "org.xerial"          % "sqlite-jdbc"         % "3.27.2.1",
-      "org.scalatest"      %% "scalatest"           % "3.0.7" % Test
+      "org.scalatest"      %% "scalatest"           % "3.0.7"  % Test,
+      "org.scalacheck"     %% "scalacheck"          % "1.14.0" % "test"
     ),
 
     // set the main class for the main 'run' task
