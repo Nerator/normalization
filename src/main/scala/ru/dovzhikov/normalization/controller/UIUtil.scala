@@ -12,8 +12,9 @@ object UIUtil {
       contentText = text
       // it is not possible to programmatically close a dialog box that doesn't have a Close/Cancel button:
       buttonTypes += ButtonType.Cancel
+      dialogPane().lookupButton(ButtonType.Cancel).disable = true
     }
-    al.getDialogPane.lookupButton(ButtonType.Cancel).disable = true
+    //al.getDialogPane.lookupButton(ButtonType.Cancel).disable = true
     al
   }
 
@@ -25,7 +26,7 @@ object UIUtil {
       headerText = header // "Choose letter"
     }
 
-  class RusAlert(tp: AlertType, content: String) extends Alert(tp, content) {
+  class RusAlert private (tp: AlertType, content: String) extends Alert(tp, content) {
     private val text = tp match {
       case AlertType.None => ""
       case AlertType.Error => "Ошибка"
@@ -35,6 +36,10 @@ object UIUtil {
     }
     title = text
     headerText = text
+  }
+
+  object RusAlert {
+    def apply(tp: AlertType, content: String): RusAlert = new RusAlert(tp, content)
   }
 }
 

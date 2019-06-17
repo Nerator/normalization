@@ -1,20 +1,19 @@
-package ru.dovzhikov.normalization.view
+package ru.dovzhikov.normalization.view.stages
 
 import ru.dovzhikov.normalization.controller.UIUtil
 import ru.dovzhikov.normalization.model.Normalization
 import ru.dovzhikov.normalization.model.db.DBUtil
+import ru.dovzhikov.normalization.view.stages.TableStage._
+
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-//import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.scene.control.{TableColumn, TableView}
 import scalafx.stage.Stage
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
-
-import TableStage._
+import scala.concurrent.{Await, ExecutionContext}
 
 class TableStage(db: DBUtil, mode: Mode) extends Stage {
 
@@ -57,7 +56,6 @@ class TableStage(db: DBUtil, mode: Mode) extends Stage {
     case Risk3 =>
       val subj = UIUtil.cd(Normalization.methods, "Выберите способ нормирования")
         .showAndWait()
-        //.map(sn => db.subjects.filter(_._2 == sn).head._1)
       subj.fold[Seq[Risk3Result]] {
         Seq.empty
       } { norm =>
@@ -158,7 +156,6 @@ class TableStage(db: DBUtil, mode: Mode) extends Stage {
   }
 
   scene = new Scene(table)
-  //table.
 
 }
 

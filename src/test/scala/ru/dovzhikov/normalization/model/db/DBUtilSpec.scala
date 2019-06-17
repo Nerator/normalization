@@ -14,7 +14,7 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(10, Minutes), interval = Span(5, Millis))
 
-  val db = new DBUtil(new File(getClass.getResource("/db-test/climate.db").toURI))
+  val db = DBUtil(new File(getClass.getResource("/db-test/climate.db").toURI))
 
   "subjIdByName" should "work correctly" in {
     whenReady(db.subjIdByName) { map =>
@@ -66,13 +66,13 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
     }
   }
 
-  "addMissingRowsToDB" should "work correctly" in { // takes ~ 5 minutes...
+  "addMissingRowsToDB" should "work correctly" ignore { // takes ~ 5 minutes...
     // copy db
     val in = Paths.get(db.file.toURI)
     val out = Paths.get(db.file.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
     Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING)
     // create DBUtil with copy and perform test
-    val testDB = new DBUtil(new File(getClass.getResource("/db-test/climate-copy.db").toURI))
+    val testDB = DBUtil(new File(getClass.getResource("/db-test/climate-copy.db").toURI))
     val rows = InputData.getValues(new File(getClass.getResource("/xls-test/ojdamage_rus.xls").toURI))
     whenReady(testDB.addMissingRowsToDB(rows)) { amount =>
       amount shouldEqual 2010

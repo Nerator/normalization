@@ -2,7 +2,7 @@ package ru.dovzhikov.normalization.controller
 
 import ru.dovzhikov.normalization.controller.UIUtil.RusAlert
 import ru.dovzhikov.normalization.model.{CSV, Normalization}
-import ru.dovzhikov.normalization.view.CSVDialog
+import ru.dovzhikov.normalization.view.dialogs.CSVDialog
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
@@ -45,7 +45,7 @@ class ChartController(baseRB: RadioButton,
 
   def baseRBAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
       baseRB.selected = false
     } { db =>
       factOrColLabel.text = "Фактор"
@@ -54,7 +54,7 @@ class ChartController(baseRB: RadioButton,
       db.factorNames onComplete {
         case Success(seq) =>
           factOrColCB.items = ObservableBuffer(seq)
-        case Failure(ex) => new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+        case Failure(ex) => RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
       }
       factOrColCB.disable = false
       fileButton.disable = true
@@ -96,19 +96,16 @@ class ChartController(baseRB: RadioButton,
           }
         case Base =>
           currentDB.fold[Unit] {
-            new RusAlert(AlertType.Error, "База данных не загружена") {
-              title = "Ошибка"
-            }.showAndWait()
+            RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
           } { db =>
             db.factorVals onComplete {
-              case Success(seq) => {
+              case Success(seq) =>
                 currentData = Some((seq filter (_._1 == value) map (_._2)).zipWithIndex map {
                   case (d,i) => (i.toString, d)
                 })
                 print(currentData.get.take(5))
                 updateChart()
-              }
-              case Failure(ex) => new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+              case Failure(ex) => RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
             }
           }
       }
@@ -122,11 +119,6 @@ class ChartController(baseRB: RadioButton,
   def allMethodsAction(ae: ActionEvent): Unit = {
     methodCB.disable = allMethodsCB.selected()
     updateChart()
-//    if (allMethodsCB.selected()) {
-//      methodCB.value = null
-//      methodCB.disable = true
-//    } else
-//      methodCB.disable = false
   }
 
   def fileButtonAction(ae: ActionEvent): Unit = {
@@ -142,9 +134,6 @@ class ChartController(baseRB: RadioButton,
       file <- Option(selectedFile)
       opts@CSV.CSVOptions(_,_,_,_) <- csvOpts
     } yield CSV(file, opts)
-//    currentCSV = csvOpts.flatMap {
-//      case c@CSV.CSVOptions(_,_,_,_) => Option(selectedFile).map(file => CSV(file, c))
-//    }
     currentCSVData = currentCSV map (_.parse)
 
     for (csv <- currentCSV) {

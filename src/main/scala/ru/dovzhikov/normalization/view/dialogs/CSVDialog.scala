@@ -1,7 +1,6 @@
-package ru.dovzhikov.normalization.view
+package ru.dovzhikov.normalization.view.dialogs
 
 import ru.dovzhikov.normalization.model.CSV
-
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.HPos

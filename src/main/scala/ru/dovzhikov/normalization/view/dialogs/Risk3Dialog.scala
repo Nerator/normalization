@@ -1,11 +1,11 @@
-package ru.dovzhikov.normalization.view
+package ru.dovzhikov.normalization.view.dialogs
 
 import ru.dovzhikov.normalization.model.Normalization
 import ru.dovzhikov.normalization.model.db.DBUtil
 import scalafx.Includes._
-import scalafx.scene.control.{ButtonType, ComboBox, Dialog, Label}
 import scalafx.geometry.Insets
 import scalafx.scene.control.ButtonBar.ButtonData
+import scalafx.scene.control.{ButtonType, ComboBox, Dialog, Label}
 import scalafx.scene.layout.GridPane
 
 import scala.language.postfixOps

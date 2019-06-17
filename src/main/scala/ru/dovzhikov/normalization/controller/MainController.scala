@@ -5,12 +5,13 @@ import java.io.File
 import ru.dovzhikov.normalization.controller.UIUtil.RusAlert
 import ru.dovzhikov.normalization.model.InputData
 import ru.dovzhikov.normalization.model.db.DBUtil
-import ru.dovzhikov.normalization.view.{ChartStage, ResultDialog, Risk2Dialog, Risk3Dialog, TableStage}
+import ru.dovzhikov.normalization.view.dialogs.{ResultDialog, Risk2Dialog, Risk3Dialog}
+import ru.dovzhikov.normalization.view.stages.{ChartStage, TableStage}
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Label}
+import scalafx.scene.control.Label
 import scalafx.scene.web.WebView
 import scalafx.stage.FileChooser
 import scalafxml.core.macros.sfxml
@@ -35,7 +36,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
       extensionFilters += new FileChooser.ExtensionFilter("Файлы баз данных", "*.db")
     }.showOpenDialog(stage)
     if (selectedFile != null)
-      currentDB = for (db <- Option(selectedFile)) yield new DBUtil(db)
+      currentDB = for (db <- Option(selectedFile)) yield DBUtil(db)
     updateStatus()
   }
 
@@ -75,7 +76,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk1AllMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       new TableStage(db, TableStage.Risk1).show()
     }
@@ -83,7 +84,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk1SubjMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       val selection = UIUtil.cd(db.subjects filter { case (_,_,l) => l > 2 } map (_._2), "Выберите субъект")
         .showAndWait()
@@ -96,7 +97,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
           case Success(risk) =>
             new ResultDialog(risk).showAndWait()
           case Failure(ex) =>
-            new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+            RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
         }
       })
     }
@@ -104,7 +105,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk2AllMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       new TableStage(db, TableStage.Risk2All).show()
     }
@@ -112,7 +113,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk2SubjMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       new TableStage(db, TableStage.Risk2Subj).show()
     }
@@ -120,7 +121,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk2WingMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       new TableStage(db, TableStage.Risk2Wing).show()
     }
@@ -128,7 +129,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk2SubjWingMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       val sl = new Risk2Dialog(db).showAndWait()
       sl foreach { case Risk2Dialog.Risk2Input(s, l) =>
@@ -140,7 +141,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
             new ResultDialog(risk).showAndWait()
           case Failure(ex) =>
             //ex.printStackTrace()
-            new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+            RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
         }
       }
     }
@@ -148,7 +149,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk3AllMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       new TableStage(db, TableStage.Risk3).show()
     }
@@ -156,7 +157,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   def risk3SubjMethodMenuAction(ae: ActionEvent): Unit = {
     currentDB.fold[Unit] {
-      new Alert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       val sn = new Risk3Dialog(currentDB.get).showAndWait()
       sn foreach { case Risk3Dialog.Risk3Input(s,n) =>
@@ -167,7 +168,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
           case Success(risk) =>
             new ResultDialog(risk).showAndWait()
           case Failure(ex) =>
-            new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+            RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
         }
       }
     }
@@ -182,7 +183,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
 
   private def processXLS(xls: File): Unit = {
     currentDB.fold[Unit] {
-      new RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
+      RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
       val rows = InputData.getValues(xls)
 
@@ -191,9 +192,9 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
         case _ => UIUtil.qal.close()
       } onComplete {
         case Success(added) =>
-          new RusAlert(AlertType.Information, s"Добавлено $added новых значений").showAndWait()
+          RusAlert(AlertType.Information, s"Добавлено $added новых значений").showAndWait()
         case Failure(ex) =>
-          new RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
+          RusAlert(AlertType.Error, s"Ошибка: ${ex.getMessage}").showAndWait()
       }
     }
   }

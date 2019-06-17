@@ -1,4 +1,4 @@
-package ru.dovzhikov.normalization.view
+package ru.dovzhikov.normalization.view.dialogs
 
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection

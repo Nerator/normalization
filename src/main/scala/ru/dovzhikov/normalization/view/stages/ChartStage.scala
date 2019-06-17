@@ -1,10 +1,12 @@
-package ru.dovzhikov.normalization.view
+package ru.dovzhikov.normalization.view.stages
 
 import java.io.IOException
 
 import javafx.scene.Parent
+
 import ru.dovzhikov.normalization.controller.ControllerWithExtras
 import ru.dovzhikov.normalization.model.db.DBUtil
+
 import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.stage.Stage

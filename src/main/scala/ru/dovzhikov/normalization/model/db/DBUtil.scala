@@ -12,11 +12,11 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 /**
-  * Модуль, содержащий операции по работе с базой данных
+  * Класс, содержащий функции для работы с базой данных
+  * @param file файл базы данных
   */
-class DBUtil(val file: File) {
+class DBUtil private(val file: File) {
 
-  //private val db = Database.forConfig("climate")
   private val db = Database.forURL(s"jdbc:sqlite:${file.getAbsolutePath}", driver = "org.sqlite.JDBC", keepAliveConnection = true)
 
   /**
@@ -53,17 +53,17 @@ class DBUtil(val file: File) {
     } yield (ss.идсубъекта, ss.площадь, ss.врп)
 
     val areaVrp =
-      for (qres <- db.run(q2.result))
+      for (q2Res <- db.run(q2.result))
         yield {
-          val seq = for ((id, ar, v) <- qres)
+          val seq = for ((id, ar, v) <- q2Res)
             yield (id.toInt -> ar.get, id.toInt -> v.get)
           (Map(seq map (_._1): _*), Map(seq map (_._2): _*))
         }
 
     val sum = for {
       (areaMap, _) <- areaVrp
-      q1res <- db.run(q1)
-    } yield q1res.map {
+      q1Res <- db.run(q1)
+    } yield q1Res.map {
       case (id, p, s, t, k) => (id.toInt, p * t * k * (if (s > areaMap(id.toInt)) 1.0 else s / areaMap(id.toInt)))
     }.groupBy(_._1) mapValues (_.map(_._2).sum)
 
@@ -112,21 +112,20 @@ class DBUtil(val file: File) {
     }: _*))
 
     val sum = for {
-      //vrpmap <- vrp //TODO: Look into why not used
-      areamap <- area
-      q1vec <- db.run(q1)
-    } yield q1vec map {
-      case (id, ot, p, s, t) => ((id.toInt, ot.head), p * t * (if (s > areamap(id.toInt)) 1.0 else s / areamap(id.toInt)))
+      areaMap <- area
+      q1Vec <- db.run(q1)
+    } yield q1Vec map {
+      case (id, ot, p, s, t) => ((id.toInt, ot.head), p * t * (if (s > areaMap(id.toInt)) 1.0 else s / areaMap(id.toInt)))
     } groupBy(_._1) map {
       case (k, vec) => (k, vec.map(_._2).sum)
     }
 
     for {
-      vrpmap <- vrp
-      summap <- sum
+      vrpMap <- vrp
+      sumMap <- sum
     } yield Map((for {
-      k <- summap.keys
-    } yield (k, summap.getOrElse(k, 0.0) * vrpmap.getOrElse(k, 0.0))).toSeq: _*)
+      k <- sumMap.keys
+    } yield (k, sumMap.getOrElse(k, 0.0) * vrpMap.getOrElse(k, 0.0))).toSeq: _*)
   }
 
   /**
@@ -165,8 +164,8 @@ class DBUtil(val file: File) {
 
     val sum = for {
       areaMap <- area
-      q2vec <- db.run(q2)
-    } yield q2vec map {
+      q2Vec <- db.run(q2)
+    } yield q2Vec map {
       case (id, p, s, t, k) => (id.toInt, p * t * k * (if (s > areaMap(id.toInt)) 1.0 else s / areaMap(id.toInt)))
     } groupBy (_._1) map {
       case (id, vec) => (id, vec.map(_._2).sum)
@@ -179,12 +178,12 @@ class DBUtil(val file: File) {
       fs <- Факторысоцрисказначения
     } yield (fs.идсубъекта, fs.кодфактора, fs.значениефактора)
 
-    val idfacts = db.run(q3.result) map (seq => Map(seq map {
+    val idFacts = db.run(q3.result) map (seq => Map(seq map {
       case (i, f, v) => ((i.toInt, f), v)
     }: _*))
 
     // Group values by factor
-    val factsValues = idfacts map (_ groupBy(_._1._2) mapValues (_.map {
+    val factsValues = idFacts map (_ groupBy(_._1._2) mapValues (_.map {
       case ((i, _), v) => (i, v)
     }))
 
@@ -194,7 +193,7 @@ class DBUtil(val file: File) {
 
     // Calculate factors sum
     val factPart = for {
-      idfactsmap <- idfacts
+      idfactsmap <- idFacts
       normValMap <- normalizedValues
     } yield idfactsmap map {
       case ((id, _), _) => (id, 0.2 * normValMap("ф01")(id) +
@@ -270,6 +269,9 @@ class DBUtil(val file: File) {
     actionsList flatMap (dbActions => db.run(DBIO.sequence(dbActions))) map (_.sum)
   }
 
+  /**
+    * Последовательность пар из буквы, обозначающей раздел экономики и названия раздела
+    */
   lazy val letters: Seq[(Char, String)] = {
     val q = РазделыЭкономики map (v => (v.раздел, v.названиеРаздела)) sortBy (_._1)
     Await.result(db.run(q.result) map (_ map { case (l, n) => (l.head, n) }), Duration("10 sec"))
@@ -278,6 +280,9 @@ class DBUtil(val file: File) {
   //    val q = РазделыЭкономики map (v => (v.раздел, v.названиеРаздела)) sortBy (_._1)
   //    db.run(q.result) map (_ map { case (l, n) => (l.take(1), n) })
   //  }
+  /**
+    * Последовательность троек из идентификатора субъекта РФ, его названия и уровня
+    */
   lazy val subjects: Seq[(Int, String, Int)] = {
     val q = СубъектыРф map (v => (v.идсубъекта, v.назсубъекта, v.уровень)) sortBy (_._1)
     Await.result(db.run(q.result) map (_ map { case (i, n, l) => (i.toInt, n, l.toInt)}), Duration("10 sec"))
@@ -299,5 +304,16 @@ class DBUtil(val file: File) {
     } yield (fs.названиефактора, fszs.значениефактора)
     db.run(q.result)
   }
+
+}
+
+object DBUtil {
+
+  /**
+    * "Конструктор" объекта DBUtil
+    * @param file файл базы данных
+    * @return объект DBUtil
+    */
+  def apply(file: File) = new DBUtil(file)
 
 }
