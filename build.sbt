@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
       organization       := "ru.dovzhikov",
       scalaVersion       := "2.12.8",
       crossScalaVersions := Seq("2.11.12", "2.12.8"),
-      version            := "0.1",
+      version            := "0.2-SNAPSHOT",
       scalacOptions ++= Seq(
         "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
         "-encoding", "utf-8",                // Specify character encoding used by source files.
