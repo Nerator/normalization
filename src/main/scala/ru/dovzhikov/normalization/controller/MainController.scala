@@ -7,6 +7,7 @@ import ru.dovzhikov.normalization.model.InputData
 import ru.dovzhikov.normalization.model.db.DBUtil
 import ru.dovzhikov.normalization.view.dialogs.{ResultDialog, Risk2Dialog, Risk3Dialog}
 import ru.dovzhikov.normalization.view.stages.{ChartStage, TableStage}
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
@@ -131,7 +132,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
     currentDB.fold[Unit] {
       RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
-      val sl = new Risk2Dialog(db).showAndWait()
+      val sl = new Risk2Dialog(db.subjects, db.letters).showAndWait()
       sl foreach { case Risk2Dialog.Risk2Input(s, l) =>
         UIUtil.qal.show()
         db.risk2ById(s, l) andThen {
@@ -159,7 +160,7 @@ class MainController(statusLabel: Label, webView: WebView) extends ControllerWit
     currentDB.fold[Unit] {
       RusAlert(AlertType.Error, "База данных не загружена").showAndWait()
     } { db =>
-      val sn = new Risk3Dialog(currentDB.get).showAndWait()
+      val sn = new Risk3Dialog(db.subjects).showAndWait()
       sn foreach { case Risk3Dialog.Risk3Input(s,n) =>
         UIUtil.qal.show()
         db.risk3ById(n, s) andThen {

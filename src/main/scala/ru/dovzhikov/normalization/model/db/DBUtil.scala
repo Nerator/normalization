@@ -243,7 +243,7 @@ class DBUtil private(val file: File) {
       val toadd = rows filterNot (xlsrow =>
         seq.contains((xlsrow.id.toInt, xlsrow.name, xlsrow.subjName))
         )
-      println(s"going to add ${toadd.length}") //TODO: 22471 all the time
+      println(s"going to add ${toadd.length}")
       toadd
     })
 

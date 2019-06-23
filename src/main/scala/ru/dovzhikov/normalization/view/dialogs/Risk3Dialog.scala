@@ -1,7 +1,7 @@
 package ru.dovzhikov.normalization.view.dialogs
 
 import ru.dovzhikov.normalization.model.Normalization
-import ru.dovzhikov.normalization.model.db.DBUtil
+
 import scalafx.Includes._
 import scalafx.geometry.Insets
 import scalafx.scene.control.ButtonBar.ButtonData
@@ -10,7 +10,8 @@ import scalafx.scene.layout.GridPane
 
 import scala.language.postfixOps
 
-final class Risk3Dialog(db: DBUtil) extends Dialog[Risk3Dialog.Risk3Input] {
+final class Risk3Dialog(subjects: Seq[(Int, String, Int)])
+  extends Dialog[Risk3Dialog.Risk3Input] {
 
   title = "Выберите субъект и метод нормирования"
   headerText = "Выберите субъект и метод нормирования"
@@ -18,7 +19,7 @@ final class Risk3Dialog(db: DBUtil) extends Dialog[Risk3Dialog.Risk3Input] {
   dialogPane().buttonTypes = Seq(ButtonType.OK, new ButtonType("Отмена", ButtonData.CancelClose))
 
   //val subjCB = new ComboBox(DBUtil.subjects.values.toSeq)
-  val subjCB = new ComboBox(db.subjects filter { case (_,_,l) => l > 2 } map (_._2))
+  val subjCB = new ComboBox(subjects filter { case (_,_,l) => l > 2 } map (_._2))
   val methodCB = new ComboBox(Normalization.methods map (_.name))
 
   dialogPane().content = new GridPane() {
@@ -34,7 +35,7 @@ final class Risk3Dialog(db: DBUtil) extends Dialog[Risk3Dialog.Risk3Input] {
 
   resultConverter = bt =>
     if (bt == ButtonType.OK) {
-      val sO = db.subjects find (_._2 == subjCB.getValue) map (_._1)
+      val sO = subjects find (_._2 == subjCB.getValue) map (_._1)
       val fO = Normalization.methods find (_.name == methodCB.getValue) map (_.f)
       val sn = for {
         s <- sO

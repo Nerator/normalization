@@ -1,6 +1,5 @@
 package ru.dovzhikov.normalization.view.dialogs
 
-import ru.dovzhikov.normalization.model.db.DBUtil
 import scalafx.Includes._
 import scalafx.scene.control.{ButtonType, ComboBox, Dialog, Label}
 //import scalafx.geometry.Insets
@@ -9,15 +8,15 @@ import scalafx.scene.layout.GridPane
 
 import scala.language.postfixOps
 
-final class Risk2Dialog(db: DBUtil) extends Dialog[Risk2Dialog.Risk2Input] {
+final class Risk2Dialog(subjects: Seq[(Int, String, Int)], letters: Seq[(Char, String)]) extends Dialog[Risk2Dialog.Risk2Input] {
 
   title = "Выберите субъект и отрасль"
   headerText = "Выберите субъект и отрасль"
 
   dialogPane().buttonTypes = Seq(ButtonType.OK, new ButtonType("Отмена", ButtonData.CancelClose))
 
-  val subjCB = new ComboBox(db.subjects filter { case (_,_,l) => l > 2 } map (_._2))
-  val wingCB = new ComboBox(db.letters map (_._2))
+  val subjCB = new ComboBox(subjects filter { case (_,_,l) => l > 2 } map (_._2))
+  val wingCB = new ComboBox(letters map (_._2))
 
   dialogPane().content = new GridPane() {
     hgap = 10
@@ -32,8 +31,8 @@ final class Risk2Dialog(db: DBUtil) extends Dialog[Risk2Dialog.Risk2Input] {
 
   resultConverter = bt =>
     if (bt == ButtonType.OK) {
-      val sO = db.subjects.find(_._2 == subjCB.getValue).map(_._1)
-      val lO = db.letters.find(_._2 == wingCB.getValue).map(_._1)
+      val sO = subjects.find(_._2 == subjCB.getValue).map(_._1)
+      val lO = letters.find(_._2 == wingCB.getValue).map(_._1)
       val sl = for {
         s <- sO
         l <- lO

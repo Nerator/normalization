@@ -33,22 +33,7 @@ object InputData {
     * @param link        download link to file
     * @return extracted XLS file
     */
-  //  def getXLS(destination: File, link: String = defaultLink): File = {
-  //    if (!destination.exists()) destination.mkdirs()
-  //    if (!destination.isDirectory) throw new IllegalArgumentException("destination should be directory")
-  //
-  //    val url = new URL(link)
-  //    val rar = new File(destination.getAbsolutePath + "/ojdamage_rus.rar")
-  //
-  //    (url #> rar).!!
-  //
-  //    Junrar.extract(rar, destination)
-  //
-  //    val farr = destination.listFiles(file => file.getName == "ojdamage_rus.xls")
-  //    if (farr.length != 1) throw new Error("downloaded archive did not contain file ojdamage_rus.xls")
-  //    rar.delete()
-  //    farr.head
-  //  }
+
   def downloadRar(destination: File = tmpDir, link: String = defaultLink): Future[File] = Future {
     if (!destination.exists()) destination.mkdirs()
     if (!destination.isDirectory) throw new IllegalArgumentException("destination should be directory")
