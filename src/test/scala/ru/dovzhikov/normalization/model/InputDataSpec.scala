@@ -12,7 +12,7 @@ class InputDataSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(5, Millis))
 
-  "downloadRar" should "work correctly" ignore {
+  "downloadRar" should "work correctly" in {
     val rar = InputData.downloadRar()
     whenReady(rar) { res =>
       res.exists shouldBe true

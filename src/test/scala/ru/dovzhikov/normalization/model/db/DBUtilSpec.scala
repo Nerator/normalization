@@ -66,7 +66,7 @@ class DBUtilSpec extends FlatSpec with Matchers with ScalaFutures {
     }
   }
 
-  "addMissingRowsToDB" should "work correctly" ignore { // takes ~ 5 minutes...
+  "addMissingRowsToDB" should "work correctly" in { // takes ~ 5 minutes...
     // copy db
     val in = Paths.get(db.file.toURI)
     val out = Paths.get(db.file.getAbsolutePath.replaceAll("climate.db", "climate-copy.db"))
